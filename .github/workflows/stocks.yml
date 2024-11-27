@@ -38,31 +38,31 @@ jobs:
       # Fetch stock data using inline Python code
       - name: Fetch stock data
         run: |
-          import requests
+          python -c |
+            import requests
 
-          # Create a session to manage cookies
-          session = requests.Session()
+            # Create a session to manage cookies
+            session = requests.Session()
 
-          # Set the User-Agent header to emulate a browser
-          session.headers.update({
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36"
-          })
+            # Set the User-Agent header to emulate a browser
+            session.headers.update({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36'
+            })
 
-          # Load cookies by requesting the main page
-          session.get("https://www.nseindia.com/")
+            # Load cookies by requesting the main page
+            session.get('https://www.nseindia.com/')
 
-          # Now request the API with the loaded cookies
-          response = session.get("https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20500")
+            # Now request the API with the loaded cookies
+            response = session.get('https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20500')
 
-          # Write the response to a file (stocks.json)
-          with open("stocks.json", "w") as f:
-              f.write(response.text)
-
+            # Write the response to a file (stocks.json)
+            with open('stocks.json', 'w') as f:
+                f.write(response.text)
+          
       # Upload the generated JSON as an artifact
       - uses: actions/upload-pages-artifact@v1
         with:
-          path: .
-          
+          path: stocks.json
 
       # Deploy the page
       - id: deployment
