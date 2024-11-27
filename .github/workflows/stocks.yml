@@ -26,14 +26,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Extract and Save Data
-        run: |
+      - run: |
           curl -s https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20500 | \
           jq '.data' > stocks.json
 
       - uses: actions/upload-pages-artifact@v1
         with:
-          path: stocks.json
+          path: .
 
       - id: deployment
         uses: actions/deploy-pages@v1
