@@ -61,7 +61,8 @@ jobs:
       # Upload the generated JSON as an artifact
       - uses: actions/upload-pages-artifact@v1
         with:
-          path: stocks.json
+          path: .
+          
 
       # Deploy the page
       - id: deployment
