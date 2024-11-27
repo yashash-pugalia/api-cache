@@ -1,0 +1,69 @@
+name: Stocks
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "5 10 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  Main:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      # Install requests module
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      # Fetch stock data using inline Python code
+      - name: Fetch stock data
+        run: |
+          python -c "import requests;
+          
+          # Create a session to manage cookies
+          session = requests.Session()
+
+          # Set the User-Agent header to emulate a browser
+          session.headers.update({
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36'
+          })
+
+          # Load cookies by requesting the main page
+          session.get('https://www.nseindia.com/')
+
+          # Now request the API with the loaded cookies
+          response = session.get('https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20500')
+
+          # Write the response to a file (stocks.json)
+          with open('stocks.json', 'w') as f:
+              f.write(response.text)
+          "
+
+      # Upload the generated JSON as an artifact
+      - uses: actions/upload-pages-artifact@v1
+        with:
+          path: .
+
+      # Deploy the page
+      - id: deployment
+        uses: actions/deploy-pages@v1
